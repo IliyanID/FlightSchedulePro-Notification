@@ -82,7 +82,3 @@ new events.Rule(this, 'EveryMinuteRule', {
   targets: [ new targets.LambdaFunction(fn) ],
 });
 ```
-
-## License
-
-MIT © Your Name
