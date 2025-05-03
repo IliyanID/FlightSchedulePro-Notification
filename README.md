@@ -20,8 +20,6 @@ A lightweight AWS CDK project that periodically logs in to FlightSchedulePro, fe
 ## Installation
 
 ```bash
-git clone https://github.com/your-org/flightschedulerchecker.git
-cd flightschedulerchecker
 npm install
 ```
 
