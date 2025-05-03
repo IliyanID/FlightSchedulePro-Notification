@@ -1,4 +1,4 @@
-# FlightSchedulerChecker
+# FlightSchedulePro Notification
 
 A lightweight AWS CDK project that periodically logs in to FlightSchedulePro, fetches your next 14 days of availability, finds qualifying free slots (≥ 1.5 h between 9 AM–5 PM MT), and sends you an email alert via SNS.
 
