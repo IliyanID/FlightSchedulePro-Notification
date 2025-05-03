@@ -91,7 +91,7 @@ export const findOverlaps = (p: FindOverlapsProps): string[] => {
     const res = 
       `✈️ ${plane?.Name} & 👩‍✈️ ${instructor.Name} free: ` +
       `${result.start.tz('America/Denver').format("YYYY-MM-DD hh:mm A")} → ` +
-      `${result.end.tz('America/Denver').format("YYYY-MM-DD hh:mm A")} ` +
+      `${result.end.tz('America/Denver').format("hh:mm A")} ` +
       `(${hrs.toFixed(2)}h)`
     console.log(res)
     return res;
