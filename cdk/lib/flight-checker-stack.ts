@@ -27,7 +27,7 @@ export class FlightCheckerStack extends cdk.Stack {
     alertTopic.addSubscription(new subs.EmailSubscription(EMAIL));
 
     const fn = new NodejsFunction(this, 'FlightCheckerHandler', {
-      runtime: lambda.Runtime.NODEJS_18_X,
+      runtime: lambda.Runtime.NODEJS_22_X,
       code: lambda.Code.fromAsset(join(__dirname, '../../dist')),
       handler: 'index.handler',
       environment: {
@@ -43,8 +43,8 @@ export class FlightCheckerStack extends cdk.Stack {
 
     new events.Rule(this, 'HourlyRule', {
       schedule: events.Schedule.cron({
-        minute: '0',
-        hour: '16-23,0',  
+        minute: '0,30',
+        hour:   '16-23,0',
       }),
       targets: [ new targets.LambdaFunction(fn) ],
     });
