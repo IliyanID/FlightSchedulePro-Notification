@@ -7,6 +7,12 @@ import { wrapper } from 'axios-cookiejar-support';
 import dayjs from 'dayjs';
 import { findOverlaps } from './findOverlaps'
 import { ApiResponseSchema } from './schemas';
+import {
+  BatchGetCommand,
+  BatchWriteCommand,
+  DynamoDBDocumentClient,
+} from '@aws-sdk/lib-dynamodb';
+import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 
 interface Credentials {
   username: string;
@@ -21,7 +27,7 @@ interface Credentials {
 }
 
 export const handler = async (): Promise<void> => {
-  const startDate = dayjs();
+  const startDate = dayjs();  
   const endDate = startDate.add(14,'day')
 
   const start = startDate.format('YYYY-MM-DD')
@@ -31,7 +37,9 @@ export const handler = async (): Promise<void> => {
   const secretArn = process.env.SECRET_ARN!;
   const username = process.env.EMAIL!;
   const topicArn = process.env.ALERT_TOPIC_ARN!;
+  const TABLE = process.env.TABLE_NAME!;
 
+  const ddb = DynamoDBDocumentClient.from(new DynamoDBClient({}));
   const secretsClient = new SecretsManagerClient({});
   const snsClient = new SNSClient({});
 
@@ -151,6 +159,29 @@ export const handler = async (): Promise<void> => {
     end: endDate,
   })
   if(result.length === 0 )return;
+
+    // batch-get existing items
+    const batchGet = await ddb.send(new BatchGetCommand({
+      RequestItems: {
+        [TABLE]: { Keys: result.map(id => ({ id })) }
+      }
+    }));
+    const existingIds = new Set(
+      batchGet.Responses?.[TABLE]?.map(item => item.id) || []
+    );
+  
+    // filter fresh
+    const fresh = result.filter(id => !existingIds.has(id));
+    if (fresh.length === 0) return;
+  
+    const ttl = dayjs().add(1, 'day').unix();
+    // batch-write new with TTL
+    const writeRequests = fresh.map(id => ({
+      PutRequest: { Item: { id, ttl } }
+    }));
+    await ddb.send(new BatchWriteCommand({
+      RequestItems: { [TABLE]: writeRequests }
+    }));
 
   console.log('Sending email!')
 
