@@ -27,7 +27,7 @@ interface Credentials {
 }
 
 export const handler = async (): Promise<void> => {
-  const startDate = dayjs();  
+  const startDate = dayjs().add(1, 'day');  
   const endDate = startDate.add(14,'day')
 
   const start = startDate.format('YYYY-MM-DD')
@@ -188,7 +188,7 @@ export const handler = async (): Promise<void> => {
   await snsClient.send(new PublishCommand({
     TopicArn: topicArn,
     Subject: 'Flight Available',
-    Message: result.join('\n\n\n'),
+    Message: fresh.join('\n\n\n'),
   }));
 };
 
